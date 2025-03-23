@@ -1,5 +1,5 @@
 {
-  "name": "glob-watch",
+  "name": "@jantimon/glob-watch",
   "version": "0.1.0",
   "description": "High-performance file watcher with multiple backend options",
   "main": "src/index.ts",

@@ -1,6 +1,6 @@
-# glob-watch
+# @jantimon/glob-watch
 
-[![npm version](https://badge.fury.io/js/glob-watch.svg)](https://badge.fury.io/js/glob-watch)
+[![npm version](https://badge.fury.io/js/%40jantimon%2Fglob-watch.svg)](https://badge.fury.io/js/%40jantimon%2Fglob-watch)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A high-performance, flexible file watching utility with smart backend selection
@@ -18,7 +18,7 @@ A high-performance, flexible file watching utility with smart backend selection
 
 ## Motivation
 
-Traditional file watchers often force a trade-off between performance, flexibility, and consistency. With glob-watch, you get:
+Traditional file watchers often force a trade-off between performance, flexibility, and consistency. With @jantimon/glob-watch, you get:
 
 - **Optimal performance** by leveraging Facebook's Watchman when available
 - **Environment adaptability** with automatic fallbacks for CI environments or platforms like Stackblitz
@@ -29,7 +29,7 @@ Traditional file watchers often force a trade-off between performance, flexibili
 ## Installation
 
 ```bash
-npm install glob-watch
+npm install @jantimon/glob-watch
 ```
 
 Recommended - for optimal watcher performance, consider installing the optional Watchman dependency:
@@ -43,7 +43,7 @@ npm install fb-watchman
 ### Watch for Changes
 
 ```typescript
-import { watch } from "glob-watch";
+import { watch } from "@jantimon/glob-watch";
 
 // Start watching files
 const destroy = await watch("src/**/*.ts", (changes) => {
@@ -59,7 +59,7 @@ destroy();
 ### Find Files (One-time Operation)
 
 ```typescript
-import { findFiles } from "glob-watch";
+import { findFiles } from "@jantimon/glob-watch";
 
 // Perfect for build scripts and CI environments
 const files = await findFiles("src/**/*.ts");
@@ -249,7 +249,7 @@ const destroy = await watch(
 - **Optional dependency:**
   - `fb-watchman`: For using the high-performance Watchman backend
 
-If `fb-watchman` isn't available, `glob-watch` will automatically fallback to `native` mode.
+If `fb-watchman` isn't available, `@jantimon/glob-watch` will automatically fallback to `native` mode.
 
 ## Compatibility
 
