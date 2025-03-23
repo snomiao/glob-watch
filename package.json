@@ -1,0 +1,53 @@
+{
+  "name": "glob-watch",
+  "version": "0.1.0",
+  "description": "High-performance file watcher with multiple backend options",
+  "main": "src/index.ts",
+  "module": "src/index.ts",
+  "sideEffects": false,
+  "type": "module",
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "test": "vitest run --no-file-parallelism",
+    "test:watch": "vitest --no-file-parallelism",
+    "format": "prettier --write .",
+    "prepublishOnly": "npm run test && prettier --check ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jantimon/glob-watch.git"
+  },
+  "keywords": [
+    "watch",
+    "glob",
+    "watchman",
+    "fs-watch",
+    "file-watcher"
+  ],
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "author": "Jan Nicklas",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jantimon/glob-watch/issues"
+  },
+  "homepage": "https://github.com/jantimon/glob-watch#readme",
+  "dependencies": {
+    "fast-glob": "^3.3.3"
+  },
+  "optionalDependencies": {
+    "fb-watchman": "^2.0.2"
+  },
+  "devDependencies": {
+    "@types/fb-watchman": "2.0.5",
+    "@types/node": "^22.13.11",
+    "fast-glob": "^3.3.2",
+    "fb-watchman": "^2.0.2",
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.2",
+    "vitest": "^1.6.1"
+  }
+}
