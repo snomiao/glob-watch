@@ -1,6 +1,11 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { watch, findFiles } from "../src/index";
-import { createTestDir, createFiles, cleanupDir } from "./utils";
+import {
+  createTestDir,
+  createFiles,
+  cleanupDir,
+  createCallTracker,
+} from "./utils";
 import path from "path";
 
 describe("Fast-glob watcher", () => {
@@ -70,6 +75,42 @@ describe("Fast-glob watcher", () => {
     expect(files).toContain("tests/index.test.ts");
     expect(files).toContain("tests/components/button.test.ts");
     expect(files).toContain("tests/components/card.test.ts");
+  });
+
+  it("should respect ignore patterns", async () => {
+    await createFiles(
+      testDir,
+      `
+      ├─ README.md
+      ├─ package.json
+      ├─ src
+      │  ├─ index.ts
+      │  └─ components
+      │     ├─ button.ts
+      │     ├─ card.ts
+      │     └─ demo.ts
+      └─ tests
+         ├─ index.test.ts
+         └─ components
+            ├─ button.test.ts
+            └─ card.test.ts
+    `,
+    );
+
+    const files = await findFiles(["**/*.ts"], {
+      cwd: testDir,
+      mode: "fast-glob",
+      ignore: ["**/demo.ts", "**/tests/**"],
+    });
+
+    expect(files.length).toBe(3);
+    expect(files).toContain("src/index.ts");
+    expect(files).toContain("src/components/button.ts");
+    expect(files).toContain("src/components/card.ts");
+    expect(files).not.toContain("src/components/demo.ts");
+    expect(files).not.toContain("tests/index.test.ts");
+    expect(files).not.toContain("tests/components/button.test.ts");
+    expect(files).not.toContain("tests/components/card.test.ts");
   });
 
   it("should return absolute paths when absolute option is true", async () => {
@@ -202,33 +243,25 @@ describe("Fast-glob watcher", () => {
     `,
     );
 
-    let callbackCalled = false;
-    let addedFiles = new Map();
+    const changes = createCallTracker<[any]>();
 
-    const destroy = await watch(
-      "**/*.ts",
-      (changes) => {
-        callbackCalled = true;
-        addedFiles = changes.added;
-      },
-      {
-        cwd: testDir,
-        mode: "fast-glob",
-      },
-    );
+    const destroy = await watch("**/*.ts", changes, {
+      cwd: testDir,
+      mode: "fast-glob",
+    });
 
-    // Callback should have been called
-    expect(callbackCalled).toBe(true);
-    expect(addedFiles.size).toBe(3);
+    // Check changes were reported correctly
+    const [{ added }] = await changes.latest();
+    expect(added.size).toBe(3);
 
     // Files should match expected paths
-    const filePaths = Array.from(addedFiles.keys());
+    const filePaths = Array.from(added.keys());
     expect(filePaths).toContain("src/index.ts");
     expect(filePaths).toContain("src/components/button.ts");
     expect(filePaths).toContain("src/components/card.ts");
 
     // FileInfo objects should contain expected properties
-    addedFiles.forEach((fileInfo) => {
+    added.forEach((fileInfo) => {
       expect(fileInfo).toHaveProperty("name");
       expect(fileInfo).toHaveProperty("path");
       expect(fileInfo).toHaveProperty("exists", true);
@@ -252,22 +285,17 @@ describe("Fast-glob watcher", () => {
     `,
     );
 
-    let fileInfoObjects = new Map();
+    const changes = createCallTracker<[any]>();
 
-    await watch(
-      "**/*.ts",
-      (changes) => {
-        fileInfoObjects = changes.added;
-      },
-      {
-        cwd: testDir,
-        mode: "fast-glob",
-        fields: ["type", "size", "mtime"],
-      },
-    );
+    await watch("**/*.ts", changes, {
+      cwd: testDir,
+      mode: "fast-glob",
+      fields: ["type", "size", "mtime"],
+    });
 
     // Check that all requested fields are present in the FileInfo objects
-    fileInfoObjects.forEach((fileInfo) => {
+    const [{ added }] = await changes.latest();
+    added.forEach((fileInfo) => {
       expect(fileInfo).toHaveProperty("type");
       expect(fileInfo).toHaveProperty("size");
       expect(fileInfo).toHaveProperty("mtime");

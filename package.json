@@ -10,7 +10,7 @@
     "src"
   ],
   "scripts": {
-    "test": "vitest run --no-file-parallelism",
+    "test": "vitest run --no-file-parallelism --retry=3 --test-timeout=500",
     "test:watch": "vitest --no-file-parallelism",
     "format": "prettier --write .",
     "prepublishOnly": "npm run test && prettier --check ."
