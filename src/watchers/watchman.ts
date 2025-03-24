@@ -82,7 +82,7 @@ export const watch = async (
     "glob-watch-" + Math.random().toString(36).substring(2, 15);
 
   // Create file filters based on options
-  const fileFilters: any[] = [];
+  const fileFilters: Expression[] = [];
 
   // Only files or only directories filter
   if (options.onlyDirectories) {
@@ -102,12 +102,25 @@ export const watch = async (
       ] as const as any,
   );
 
+  // Process ignore patterns
+  const ignoreExpressions: Expression[] = [];
+  if (options.ignore) {
+    const ignorePatterns = Array.isArray(options.ignore)
+      ? options.ignore
+      : [options.ignore];
+
+    for (const pattern of ignorePatterns) {
+      ignoreExpressions.push(["not", ["match", pattern, "wholename"]]);
+    }
+  }
+
   // Build the final expression
-  const expression = [
+  let expression: Expression = [
     "allof",
     ...fileFilters,
     ["anyof", ...matchExpressions],
-  ] as Expression;
+    ...ignoreExpressions,
+  ];
 
   // Determine fields to request from watchman
   const requestFields: (keyof FileChange)[] = ["name", "exists", "type"];
@@ -144,7 +157,6 @@ export const watch = async (
   });
 
   // Process initial file list
-
   await new Promise<void>((resolve) => {
     const initialRun = (resp: SubscriptionResponse) => {
       if (resp.subscription !== subscriptionName) {

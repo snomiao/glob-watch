@@ -260,11 +260,6 @@ describe("Watchman watcher", () => {
   });
 
   it("should detect new files after watching starts", async () => {
-    // Skip this test if using vitest in CI where file watching might not work reliably
-    if (process.env.CI) {
-      return;
-    }
-
     await createFiles(
       testDir,
       `
@@ -296,6 +291,53 @@ describe("Watchman watcher", () => {
     const [fileChanges] = await changes.latest();
 
     expect(fileChanges.added.has("src/components/new-file.ts")).toBe(true);
+
+    destroy();
+  });
+
+  it("should allow to ignore files new files after watching starts", async () => {
+    await createFiles(
+      testDir,
+      `
+      ├─ README.md
+      ├─ package.json
+      └─ src
+         ├─ index.ts
+         └─ components
+            └─ button.ts
+    `,
+    );
+
+    const changes = createCallTracker<[FileChanges]>();
+
+    // Start watching
+    const destroy = await watch("**/*.ts", changes, {
+      cwd: testDir,
+      mode: "watchman",
+      ignore: ["**/new-file.demo.ts"],
+    });
+
+    // Wait for initial watch to complete
+    await changes.latest();
+    changes.reset();
+
+    await createFiles(
+      testDir,
+      `
+      └─ src
+         └─ components
+            ├─ new.ts
+            └─ new-file.demo.ts
+    `,
+    );
+
+    // Wait for the change to be detected
+    const [fileChanges] = await changes.latest();
+
+    expect(fileChanges.added.has("src/components/new.ts")).toBe(true);
+    expect(fileChanges.added.has("src/components/new-file.demo.ts")).toBe(
+      false,
+    );
 
     destroy();
   });

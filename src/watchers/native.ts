@@ -24,6 +24,9 @@ export async function watch(
   const watchDirs = new Set<string>();
   const cwd = options.cwd || process.cwd();
 
+  // Create ignore matcher
+  const ignoreMatcher = await createIgnoreMatcher(options.ignore);
+
   // Get initial file list using fast-glob
   const initialScan = await new Promise<FileChanges>((resolve) => {
     // Create a temporary callback that captures the initial file list
@@ -65,8 +68,14 @@ export async function watch(
    */
   function handleFileChange(filePath: string, eventType: string): void {
     const absolutePath = path.resolve(cwd, filePath);
+
     // Skip hidden files if dot option is not enabled
     if (!options.dot && path.basename(filePath).startsWith(".")) {
+      return;
+    }
+
+    // Skip ignored files
+    if (ignoreMatcher(filePath)) {
       return;
     }
 
@@ -210,4 +219,19 @@ export async function watch(
 
   // Return destroy function
   return destroy;
+}
+
+/**
+ * Creates a matcher function for ignore patterns
+ */
+async function createIgnoreMatcher(ignore?: string | string[]) {
+  if (!ignore) {
+    return () => false;
+  }
+  const micromatch = await import("micromatch");
+  const patterns = Array.isArray(ignore) ? ignore : [ignore];
+  // Precompile matchers for each pattern
+  const matchers = patterns.map((pattern) => micromatch.matcher(pattern));
+  // Create a single matcher function that checks all patterns
+  return (filePath: string) => matchers.some((matcher) => matcher(filePath));
 }

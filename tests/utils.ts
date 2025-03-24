@@ -23,6 +23,7 @@ export async function createFiles(
   // Track the current path at each indentation level
   const pathAtIndent: Record<number, string[]> = {};
   let lastIndent = -1;
+  let createdFiles = await countFile(baseDir);
 
   for (const line of lines) {
     // Find position of the branch indicator
@@ -69,12 +70,31 @@ export async function createFiles(
     } else {
       // Create file with empty content or the name as content
       fs.writeFileSync(fullPath, itemName);
+      createdFiles++;
     }
 
     lastIndent = currentIndent;
   }
 
   await sleep(20);
+  const countOnDisk = await countFile(baseDir);
+  if (createdFiles !== countOnDisk) {
+    throw new Error(
+      `Expected ${createdFiles} files, but found ${countOnDisk} files.`,
+    );
+  }
+}
+
+async function countFile(baseDir: string): Promise<number> {
+  const { default: fastGlob } = await import("fast-glob");
+  // verify that all files are created
+  const files = await fastGlob([path.join(baseDir, "**/*")], {
+    dot: true,
+    absolute: true,
+    onlyFiles: true,
+    cwd: baseDir,
+  });
+  return files.length;
 }
 
 /**

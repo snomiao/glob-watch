@@ -43,6 +43,12 @@ export interface WatchOptions {
   mode?: WatcherMode;
 
   /**
+   * Patterns to ignore (will not be watched or returned)
+   * @default undefined
+   */
+  ignore?: string | string[];
+
+  /**
    * Fields to include in the FileInfo objects
    */
   fields?: Array<"type" | "size" | "mtime">;

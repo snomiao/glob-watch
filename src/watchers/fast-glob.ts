@@ -24,11 +24,18 @@ export const watch = async (
     // Run fast-glob to find matching files
     const entries = await fg(patternArray, {
       cwd,
-      absolute: false, // We'll handle this ourselves
+      absolute: false,
       onlyDirectories: options.onlyDirectories || false,
-      onlyFiles: options.onlyFiles !== false, // Default to true
+      // Default to true
+      onlyFiles: options.onlyFiles !== false,
       dot: options.dot || false,
-      stats: true, // Get file stats for additional information
+      // Get file stats for additional information
+      stats: true,
+      ignore: options.ignore
+        ? Array.isArray(options.ignore)
+          ? options.ignore
+          : [options.ignore]
+        : [],
     });
 
     // Create the changes object to pass to the callback
