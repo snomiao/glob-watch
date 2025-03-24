@@ -195,7 +195,8 @@ export async function watch(
       const entries = fs.readdirSync(dirPath, { withFileTypes: true });
 
       for (const entry of entries) {
-        if (entry.isDirectory()) {
+        if (entry.isDirectory() && !entry.isSymbolicLink()) {
+          // Only watch non-symlink directories
           const subDirPath = path.join(dirPath, entry.name);
           setupDirectoryWatcher(subDirPath);
         }

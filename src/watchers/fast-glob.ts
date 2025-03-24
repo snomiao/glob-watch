@@ -30,6 +30,7 @@ export const watch = async (
       onlyFiles: options.onlyFiles !== false,
       dot: options.dot || false,
       // Get file stats for additional information
+      followSymbolicLinks: false,
       stats: true,
       ignore: options.ignore
         ? Array.isArray(options.ignore)
@@ -77,6 +78,9 @@ export const watch = async (
         }
         if (options.fields.includes("mtime")) {
           fileInfo.mtime = stats.mtimeMs;
+        }
+        if (options.fields.includes("type") && stats.isSymbolicLink()) {
+          fileInfo.type = "l";
         }
       }
 

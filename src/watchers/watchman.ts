@@ -203,10 +203,14 @@ export const watch = async (
     };
 
     // Process each file change
-    resp.files.forEach((file: any) => {
+    resp.files.forEach((file) => {
       const fileInfo = createFileInfo(file, cwd);
       const fileExists = file.exists !== false;
       const existingFile = existingFiles.get(fileInfo.path);
+      if (file.type === "l") {
+        // Ignore symbolic links if followSymbolicLinks is explicitly false
+        return;
+      }
 
       if (!existingFile && fileExists) {
         // New file

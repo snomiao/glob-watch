@@ -397,5 +397,50 @@ export function createWatcherTests(mode: WatcherMode) {
 
       destroy();
     });
+
+    it("should not find files through symbolic links outside of the cwd to directories", async () => {
+      await createFiles(
+        testDir,
+        `
+        ├─ shared
+        │  └─ components
+        │     ├─ button-shared.ts
+        │     └─ card-shared.ts
+        └─ src
+           ├─ index.ts
+           └─ components -> ../shared/components
+        `,
+      );
+
+      const files = await findFiles(["**/*.ts"], {
+        cwd: path.join(testDir, "src"),
+        mode,
+      });
+
+      expect(files).toHaveProperty("length", 1);
+      expect(files).toContain("index.ts");
+    });
+
+    it("should not find files through symbolic links", async () => {
+      await createFiles(
+        testDir,
+        `
+        └─ src
+           ├─ sym/link -> ../components
+           └─ components
+              ├─ button-shared.ts
+              └─ card-shared.ts
+        `,
+      );
+
+      const files = await findFiles(["**/*.ts"], {
+        cwd: testDir,
+        mode,
+      });
+
+      expect(files).toHaveProperty("length", 2);
+      expect(files).toContain("src/components/button-shared.ts");
+      expect(files).toContain("src/components/card-shared.ts");
+    });
   });
 }
