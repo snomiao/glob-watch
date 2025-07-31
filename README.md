@@ -245,6 +245,7 @@ const destroy = await watch(
 ## Dependencies
 
 - **Required peer dependency:**
+
   - `fast-glob`: For pattern matching in both `native` and `fast-glob` modes
 
 - **Optional dependency:**
