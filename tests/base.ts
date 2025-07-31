@@ -306,7 +306,9 @@ export function createWatcherTests(mode: WatcherMode) {
       );
 
       // Wait for the change to be detected
-      const [{ added }] = await changes.latest();
+      // Use .first() insteadof latest because I sometimes got 2 events [added, changed].
+      const [{ added }] = await changes.first();
+
       expect([...added.keys()]).toEqual(["src/components/new-file.ts"]);
 
       destroy();
@@ -388,7 +390,8 @@ export function createWatcherTests(mode: WatcherMode) {
       );
 
       // Wait for the change to be detected
-      const [fileChanges] = await changes.latest();
+      // Use .first() insteadof latest because I sometimes got 2 events [added, changed].
+      const [fileChanges] = await changes.first();
 
       expect(fileChanges.added.has("src/components/new.ts")).toBe(true);
       expect(fileChanges.added.has("src/components/new-file.demo.ts")).toBe(

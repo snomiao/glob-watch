@@ -229,6 +229,17 @@ export function createCallTracker<Args extends any[]>() {
     },
 
     /**
+     * Returns the first callback invocation arguments
+     * If no callbacks have been made yet, waits for the next one
+     */
+    first: async (): Promise<Args> => {
+      if (callHistory.length === 0) {
+        return nextPromise;
+      }
+      return callHistory[0];
+    },
+
+    /**
      * Returns an array of all callback invocation arguments
      */
     get all() {
