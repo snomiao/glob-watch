@@ -2,8 +2,8 @@
   "name": "@snomiao/glob-watch",
   "version": "0.2.1",
   "description": "(fork) High-performance file watcher with multiple backend options",
-  "main": "dist/index.js",
-  "module": "dist/index.js",
+  "main": "dist/index.ts",
+  "module": "dist/index.ts",
   "types": "src/index.ts",
   "sideEffects": false,
   "type": "module",
@@ -11,6 +11,10 @@
     "src",
     "dist"
   ],
+  "exports": {
+    "import": "./dist/index.js",
+    "types": "./src/index.ts"
+  },
   "scripts": {
     "test": "vitest run --no-file-parallelism --retry=3 --test-timeout=500",
     "test:watch": "vitest --no-file-parallelism",
