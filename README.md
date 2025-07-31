@@ -1,3 +1,5 @@
+forked by @snomiao, for fixing tests and package exports
+
 # @jantimon/glob-watch
 
 [![npm version](https://badge.fury.io/js/%40jantimon%2Fglob-watch.svg)](https://badge.fury.io/js/%40jantimon%2Fglob-watch)
@@ -243,7 +245,6 @@ const destroy = await watch(
 ## Dependencies
 
 - **Required peer dependency:**
-
   - `fast-glob`: For pattern matching in both `native` and `fast-glob` modes
 
 - **Optional dependency:**

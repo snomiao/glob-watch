@@ -1,23 +1,26 @@
 {
-  "name": "@jantimon/glob-watch",
-  "version": "0.2.0",
-  "description": "High-performance file watcher with multiple backend options",
-  "main": "src/index.ts",
-  "module": "src/index.ts",
+  "name": "@snomiao/glob-watch",
+  "version": "0.2.1",
+  "description": "(fork) High-performance file watcher with multiple backend options",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "src/index.ts",
   "sideEffects": false,
   "type": "module",
   "files": [
-    "src"
+    "src",
+    "dist"
   ],
   "scripts": {
     "test": "vitest run --no-file-parallelism --retry=3 --test-timeout=500",
     "test:watch": "vitest --no-file-parallelism",
+    "build": "bun build src/index.ts --outdir=dist --target=node --package=external",
     "format": "prettier --write .",
-    "prepublishOnly": "npm run test && prettier --check ."
+    "prepublishOnly": "npm run test && prettier --write . && npm run build"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jantimon/glob-watch.git"
+    "url": "git+https://github.com/snomiao/glob-watch.git"
   },
   "keywords": [
     "watch",
@@ -46,10 +49,12 @@
     "@types/micromatch": "^4.0.9",
     "@types/fb-watchman": "2.0.5",
     "@types/node": "^22.13.12",
-    "fast-glob": "^3.3.2",
     "fb-watchman": "^2.0.2",
     "prettier": "^3.5.3",
     "typescript": "^5.8.2",
     "vitest": "^1.6.1"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
